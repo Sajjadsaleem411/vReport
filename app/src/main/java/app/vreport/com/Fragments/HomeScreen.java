@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,8 @@ public class HomeScreen extends Fragment {
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);*/
         ViewPager vpPager = (ViewPager) rootView.findViewById(R.id.vpPager);
         MyPagerAdapter adapterViewPager = new MyPagerAdapter(getFragmentManager());
+        vpPager.setOffscreenPageLimit(3);
+
         vpPager.setAdapter(adapterViewPager);
 
         return rootView;
@@ -29,8 +32,8 @@ public class HomeScreen extends Fragment {
 
 
     public static class MyPagerAdapter extends FragmentPagerAdapter {
-        private static int NUM_ITEMS = 2;
-        String[] title = {"MAP", "EVENTS"};
+        private static int NUM_ITEMS = 3;
+        String[] title = {"MAP", "EVENTS","GRAPH"};
 
         public MyPagerAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
@@ -56,6 +59,10 @@ public class HomeScreen extends Fragment {
                     else {
                         return NullFragment.newInstance();
                     }
+
+
+                case 2: // Fragment # 0 - This will show FirstFragment
+                    return GraphFragment.newInstance();
 
                 default:
                     return null;

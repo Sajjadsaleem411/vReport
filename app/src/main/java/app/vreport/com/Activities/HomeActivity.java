@@ -1,6 +1,5 @@
 package app.vreport.com.Activities;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -54,6 +53,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 
 import app.vreport.com.Activities.Report.ReportActivity;
+import app.vreport.com.Controller.GPSTracker;
 import app.vreport.com.Controller.MyLocationListener;
 import app.vreport.com.Controller.ServerConnection;
 import app.vreport.com.Fragments.HomeScreen;
@@ -68,17 +68,20 @@ public class HomeActivity extends AppCompatActivity
     ImageView header_image;
     TextView header_name, header_email;
     public static GoogleMap mGoogleMap;
-    public static Double mlog=0.33333,mlat=0.3333;
+    public static Double mlog = 0.33333, mlat = 0.3333;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         try {
 
+        //    if (SplashScreen.isOnline(this)) {
 /*
-            ServerConnection serverConnection=new ServerConnection(this);
-            serverConnection.SubmitToServer();
+                ServerConnection serverConnection = new ServerConnection(this, 1);
+                serverConnection.SubmitToServer();
 */
+//            }
 
             final String[] userdata = SplashScreen.sql.GetUserData();
 
@@ -92,10 +95,20 @@ public class HomeActivity extends AppCompatActivity
                     //           Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     //                 .setAction("Action", null).show();
                     try {
-                        if (displayGpsStatus()) {
+                       /* if (displayGpsStatus()) {
 
                             Intent intent = new Intent(HomeActivity.this, ReportActivity.class);
                             startActivity(intent);
+                        }*/
+                        if (displayGpsStatus() && SplashScreen.isOnline(HomeActivity.this)) {
+
+                            Intent intent = new Intent(HomeActivity.this, ReportActivity.class);
+                            startActivity(intent);
+                        } else if (!SplashScreen.isOnline(HomeActivity.this)) {
+                            HomeActivity.showMessage("Internet Off", "Please check your Internet Connection .", HomeActivity.this);
+
+                        } else {
+                            HomeActivity.showMessage("GPS Is Disable", "Please check your Device's GPS .", HomeActivity.this);
                         }
                     } catch (Exception e) {
 
@@ -113,18 +126,18 @@ public class HomeActivity extends AppCompatActivity
                 /*Navigator Header fields*/
             NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
             View hView = navigationView.getHeaderView(0);
-            hView.setOnClickListener(new View.OnClickListener() {
+            /*hView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if(userdata!=null&&userdata[1] != null&&userdata[2] != null)
                     startActivity(new Intent(HomeActivity.this,Profile.class));
                 }
-            });
+            });*/
 
             header_image = (ImageView) hView.findViewById(R.id.header_image);
 
             header_name = (TextView) hView.findViewById(R.id.header_name);
-        //    header_name.setVisibility(View.INVISIBLE);
+            //    header_name.setVisibility(View.INVISIBLE);
 
             header_email = (TextView) hView.findViewById(R.id.header_email);
             header_email.setVisibility(View.INVISIBLE);
@@ -156,7 +169,7 @@ public class HomeActivity extends AppCompatActivity
                     getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, fragment);
             fragmentTransaction.commit();
-            if (googleApiClient == null) {
+        /*    if (googleApiClient == null) {
                 googleApiClient = new GoogleApiClient.Builder(this)
                         .addApi(LocationServices.API)
                         .addConnectionCallbacks(this)
@@ -170,9 +183,9 @@ public class HomeActivity extends AppCompatActivity
                 LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                         .addLocationRequest(locationRequest);
 
-                /*************************/
+                *//*************************//*
                 builder.setAlwaysShow(true); //this is the key ingredient
-                /*************************/
+                *//*************************//*
 
                 PendingResult<LocationSettingsResult> result =
                         LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
@@ -204,7 +217,7 @@ public class HomeActivity extends AppCompatActivity
                                 break;
                         }
                     }
-                });             }
+                });             }*/
 
 
         } catch (Exception e) {
@@ -261,7 +274,7 @@ public class HomeActivity extends AppCompatActivity
             startActivity(intent);
 
         }
-         if (id == R.id.nav_logout) {
+        if (id == R.id.nav_logout) {
             try {
                 SplashScreen.sql.ClearTableData("user");
                 intent = new Intent(HomeActivity.this, LoginActivity.class);
@@ -274,11 +287,10 @@ public class HomeActivity extends AppCompatActivity
 
             }
         }
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
 
 
     /*----Method to Check GPS is enable or disable ----- */
@@ -292,7 +304,6 @@ public class HomeActivity extends AppCompatActivity
             return true;
 
         } else {
-            HomeActivity.showMessage("GPS Is Disable", "Please check your Device's GPS .", this);
             return false;
         }
     }
@@ -335,7 +346,7 @@ public class HomeActivity extends AppCompatActivity
 /*
         startActivity(new Intent(HomeActivity.this,HomeActivity.class));
         finish();*/
-    }
+    }/*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -350,14 +361,14 @@ public class HomeActivity extends AppCompatActivity
                             @Override
                             public void run() {
                   //               Create an Intent that will start the Menu-Activity.
-                             /*   startActivity(new Intent(HomeActivity.this,HomeActivity.class));
+                             *//*   startActivity(new Intent(HomeActivity.this,HomeActivity.class));
                                     finish();
-                         */
-                             /*Get current Location user */
+                         *//*
+                             *//*Get current Location user *//*
 
-                                
+
                                 LocationManager locationManagerCt = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-      /*  if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+      *//*  if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -366,7 +377,9 @@ public class HomeActivity extends AppCompatActivity
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
             return TODO;
-        }*/
+        }*//*
+
+                                *//*
                                 Location locationCt = locationManagerCt
                                         .getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
@@ -381,7 +394,7 @@ public class HomeActivity extends AppCompatActivity
                                         .target(new LatLng(locationCt.getLatitude(), locationCt.getLongitude())).zoom(15).build();
 
                                 HomeActivity.mGoogleMap.animateCamera(CameraUpdateFactory
-                                        .newCameraPosition(cameraPosition));
+                                        .newCameraPosition(cameraPosition));*//*
                             }
                         }, 5000);
                         break;
@@ -391,7 +404,8 @@ public class HomeActivity extends AppCompatActivity
                 }
                 break;
         }
-    }
+    }*/
+
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 

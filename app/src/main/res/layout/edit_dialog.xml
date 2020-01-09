@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:padding="8dp"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true">
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp">
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="LOCATION"
+                android:textColor="@color/textColor"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/textColor" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+
+
+                <EditText
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:editable="false"
+                    android:paddingLeft="5dp"
+                    android:cursorVisible="false"
+                    android:textSize="15dp"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/textColor"
+                    android:text="Search your Area"
+                    android:background="@android:color/white"
+                    android:id="@+id/search"/>
+                <Button
+                    android:id="@+id/search_area"
+                    android:layout_width="wrap_content"
+                    android:imeOptions="actionSearch"
+                    android:textColor="@color/white"
+                    android:layout_height="wrap_content"
+                    android:text="Set"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/textColor" />
+    <DatePicker
+        android:id="@+id/date_picker"
+        android:layout_width="match_parent"
+        android:calendarViewShown="false"
+        android:layout_weight="4"
+        android:layout_marginTop="-15dp"
+        android:datePickerMode="spinner"
+        android:layout_height="0dp" />
+
+            <View
+
+                android:layout_marginTop="-10dp"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/textColor" />
+
+    <TimePicker
+        android:id="@+id/time_picker"
+        android:layout_marginBottom="-10dp"
+        android:timePickerMode="spinner"
+        android:layout_weight="4"
+        android:layout_marginTop="-15dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+
+
+            </LinearLayout>
+    </ScrollView>
+    <Button
+
+        android:layout_gravity="bottom"
+        android:id="@+id/date_time_set"
+        android:layout_width="match_parent"
+        android:textColor="@color/white"
+        android:text="Set"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

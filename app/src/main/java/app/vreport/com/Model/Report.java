@@ -1,9 +1,20 @@
 package app.vreport.com.Model;
 
+import android.location.Location;
+
 /**
  * Created by Sajjad Saleem on 1/3/2017.
  */
 public class Report {
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public Location location;
     public Double Latitude, Longitude;
     public String describtion;
     public String ReportImage;
@@ -12,21 +23,26 @@ public class Report {
 
     public String place;
     public String City;
+
+
+    public String Country;
     public int vote;
     public String category;
 
     public String userName;
     public String userImage;
 
-    public String getSubCategory1() {
-        return SubCategory1;
-    }
-
-    public void setSubCategory1(String subCategory1) {
-        SubCategory1 = subCategory1;
-    }
-
     public String SubCategory1;
+
+    public String getApplicationUserId() {
+        return ApplicationUserId;
+    }
+
+    public void setApplicationUserId(String applicationUserId) {
+        ApplicationUserId = applicationUserId;
+    }
+
+    public String ApplicationUserId;
 
     public Report() {
 
@@ -94,6 +110,22 @@ public class Report {
 
     public void setCity(String city) {
         City = city;
+    }
+
+    public String getSubCategory1() {
+        return SubCategory1;
+    }
+
+    public void setSubCategory1(String subCategory1) {
+        SubCategory1 = subCategory1;
+    }
+
+    public String getCountry() {
+        return Country;
+    }
+
+    public void setCountry(String country) {
+        Country = country;
     }
 
     public int getVote() {

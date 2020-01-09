@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import app.vreport.com.Activities.Report.GeneralForm;
 import app.vreport.com.Model.Map;
 import app.vreport.com.Model.Report;
+import app.vreport.com.Model.Resources;
 
 /**
  * Created by Sajjad Saleem on 1/1/2017.
@@ -22,6 +23,8 @@ import app.vreport.com.Model.Report;
 public class SqLite {
     SQLiteDatabase db;
     Context mContext;
+
+    int rang = 5;
 
     public SqLite(Context context) {
         mContext = context;
@@ -47,38 +50,52 @@ public class SqLite {
                 "user_name VARCHAR," +
                 "user_image VARCHAR," +
                 "sub_category1 VARCHAR," +
+                "country VARCHAR," +
                 "created_at DATETIME DEFAULT CURRENT_TIMESTAMP);");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS user(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-                "name VARCHAR," +
+                "username VARCHAR," +
                 "email VARCHAR," +
                 "image VARCHAR," +
                 "number VARCHAR," +
+                "f_name VARCHAR," +
+                "l_name VARCHAR," +
+                "gender VARCHAR," +
+                "password VARCHAR," +
+                "token VARCHAR," +
                 "created_at DATETIME DEFAULT CURRENT_TIMESTAMP);");
 
     }
 
-    public int InsertUserData(String name, String email, String image, String number) {
+    public void InsertUserData(String name, String email, String image,
+                              String number, String f_name, String l_name,
+                              String gender, String password, String token) {
 
-
+/*
         Cursor c = db.rawQuery("SELECT * FROM user where name='" + name + "' " +
                 "and email ='" + email + "' and image='" + image + "'", null);
-        if (c.getCount() == 0) {
+        if (c.getCount() == 0) {*/
             //        showMessage("Error", "No records found");
             Log.d("error", "no data in survey database");
             try {
 
                 ContentValues insertValues = new ContentValues();
-                insertValues.put("name", name);
-                insertValues.put("email", email);
-                insertValues.put("image", image);
-                insertValues.put("number", number);
+                insertValues.put("username",""+name);
+                insertValues.put("email",""+ email);
+                insertValues.put("image",""+ image);
+                insertValues.put("number",""+ number);
+                insertValues.put("f_name",""+ f_name);
+                insertValues.put("l_name",""+ l_name);
+                insertValues.put("gender", ""+gender);
+                insertValues.put("password",""+ password);
+                insertValues.put("token", ""+token);
+
 
                 db.insert("user", null, insertValues);
             } catch (Exception e) {
 
             }
-        }
+       /* }
 
 
         c = db.rawQuery("SELECT id FROM user where name='" + name + "' " +
@@ -94,32 +111,34 @@ public class SqLite {
                 return Integer.parseInt(c.getString(0));
 
             } while (c.moveToNext());
-        }
+        }*/
     }
 
-    public void InsertReportData() {
+    public void InsertReportData(Report report) {
         try {
 
             ContentValues insertValues = new ContentValues();
-            insertValues.put("vote", GeneralForm.report.getVote());
-            insertValues.put("description", GeneralForm.report.getDescribtion());
-            insertValues.put("sub_category1", GeneralForm.report.getSubCategory1());
-            insertValues.put("category", GeneralForm.report.getCategory());
-            insertValues.put("sub_category", GeneralForm.report.getSubCategory());
-            insertValues.put("longitude", "" + GeneralForm.report.getLongitude());
-            insertValues.put("latitude", "" + GeneralForm.report.getLatitude());
-            if (GeneralForm.report.getPlace() != null && GeneralForm.report.getCity() != null) {
-                insertValues.put("place", "" + GeneralForm.report.getPlace());
-                insertValues.put("city", "" + GeneralForm.report.getCity());
+            insertValues.put("vote", report.getVote());
+            insertValues.put("description", report.getDescribtion());
+            insertValues.put("sub_category1", report.getSubCategory1());
+            insertValues.put("category", report.getCategory());
+            insertValues.put("sub_category", report.getSubCategory());
+            insertValues.put("longitude", "" + report.getLongitude());
+            insertValues.put("latitude", "" + report.getLatitude());
+            if (report.getPlace() != null && report.getCity() != null
+                    && report.getCountry() != null) {
+                insertValues.put("place", "" + report.getPlace());
+                insertValues.put("city", "" + report.getCity());
+                insertValues.put("country", "" + report.getCountry());
             }
-            insertValues.put("date", "" + GeneralForm.report.getDate());
-            if (GeneralForm.report.getReportImage() != null) {
-                insertValues.put("report_image", "" + GeneralForm.report.getReportImage());
+            insertValues.put("date", "" + report.getDate());
+            if (report.getReportImage() != null) {
+                insertValues.put("report_image", "" + report.getReportImage());
             }
-            insertValues.put("user_name", "" + GeneralForm.report.getUserName());
+            insertValues.put("user_name", "" + report.getUserName());
 
-            if (GeneralForm.report.getUserImage() != null) {
-                insertValues.put("user_image", "" + GeneralForm.report.getUserImage());
+            if (report.getUserImage() != null) {
+                insertValues.put("user_image", "" + report.getUserImage());
             }
 
             db.insert("report", null, insertValues);
@@ -185,6 +204,8 @@ public class SqLite {
                 Log.d("other_text", "" + c.getString(10));
             }
 
+            Log.d("Country", "" + c.getString(14));
+
 
         }
     }
@@ -234,6 +255,9 @@ public class SqLite {
                 report.setReportImage("" + c.getString(10));
                 report.setUserName("" + c.getString(11));
                 report.setUserImage("" + c.getString(12));
+
+
+                report.setCountry("" + c.getString(14));
 
 
                 reports.add(report);
@@ -293,7 +317,7 @@ public class SqLite {
         return db.delete(TABLE_NAME, "id" + "='" + id + "'", null) > 0;
     }
 
-    public JSONObject Report(int id) {
+    /*public JSONObject Report(Report r) {
         Cursor c = db.rawQuery("SELECT * FROM report where id='" + id + "'", null);
         JSONObject obj = new JSONObject();
 
@@ -304,7 +328,7 @@ public class SqLite {
         }
 
         while (c.moveToNext()) {
-            Log.d("debug", "Report**********");
+            Log.d("debug", "ReportJSON**********");
             Log.d("id=", "" + c.getString(0));
             Log.d("vote", "" + c.getString(1));
             Log.d("description", "" + c.getString(2));
@@ -341,8 +365,45 @@ public class SqLite {
             }
 
 
-
         }
         return obj;
+    }*/
+
+    public float[] getGraphData(String place) {
+        float[] count = new float[rang];
+
+        try {
+            Cursor c;
+            Resources res = new Resources();
+
+
+            if (place != null && !place.isEmpty()) {
+                for (int i = 0; i < rang; i++) {
+                    c = db.rawQuery("SELECT * FROM report where category='" +
+                            res.category_graph[i] + "' and place ='" + place + "'", null);
+                    Log.d("Count", res.category_graph[i] + "=" + c.getCount());
+                    count[i] = (float) c.getCount();
+                }
+            } else {
+
+                for (int i = 0; i < rang; i++) {
+                    c = db.rawQuery("SELECT * FROM report where category='" +
+                            res.category_graph[i] + "'", null);
+                    Log.d("Count", res.category_graph[i] + "=" + c.getCount());
+                    count[i] = (float) c.getCount();
+                }
+            }
+
+
+        } catch (Exception e) {
+            Toast.makeText(mContext, "SQL_Getlist " + e,
+                    Toast.LENGTH_SHORT).show();
+
+        }
+
+
+        return count;
+
     }
+
 }

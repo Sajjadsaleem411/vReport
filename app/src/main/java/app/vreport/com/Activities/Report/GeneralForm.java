@@ -1,37 +1,70 @@
 package app.vreport.com.Activities.Report;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.google.ads.AdRequest;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 
 import app.vreport.com.Activities.HomeActivity;
@@ -41,13 +74,24 @@ import app.vreport.com.Model.Report;
 import app.vreport.com.Model.ReportData;
 import app.vreport.com.Model.Resources;
 import app.vreport.com.R;
-
+import app.vreport.com.Controller.*;
 
 public class GeneralForm extends AppCompatActivity implements View.OnClickListener {
 
     static int turn = -1;
     int prevoiusTurn = -1;
-    boolean category_flag=false;
+    boolean category_flag = false;
+
+    /*Popup Fields Needs*/
+    location mlocation;
+
+    int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    Button search_area;
+    EditText text_area;
+    String[] Address;
+
+    /********/
+
 
     public static Report report = new Report();
 
@@ -95,6 +139,7 @@ public class GeneralForm extends AppCompatActivity implements View.OnClickListen
         mSubCatIndex[1] = getIntent().getExtras().getInt("SubCategory2");
         mSubCatIndex[2] = getIntent().getExtras().getInt("SubCategory3");
 
+        mlocation = new location(this);
         mResourceData = new Resources();
         GeneralForm.report.setCategory(mResourceData.name[mResourceIndex][0]);
 
@@ -114,7 +159,10 @@ public class GeneralForm extends AppCompatActivity implements View.OnClickListen
         mInitialization();
 
 
-        /*Get current Location user */
+        GPSTracker tracker = new GPSTracker(this);
+        mlocation.getLocationFromAddress(tracker.getLatitude(), tracker.getLongitude());
+
+ /*       *//*Get current Location user *//*
         locationMangaer = (LocationManager)
                 getSystemService(Context.LOCATION_SERVICE);
         MyLocationListener locationListener = new MyLocationListener(this);
@@ -122,7 +170,7 @@ public class GeneralForm extends AppCompatActivity implements View.OnClickListen
         locationMangaer.requestLocationUpdates(LocationManager
                 .GPS_PROVIDER, 5000, 10, locationListener);
 
-
+*/
     }
 
     /*Initialize All field's*/
@@ -180,8 +228,8 @@ public class GeneralForm extends AppCompatActivity implements View.OnClickListen
                      v.invalidate();
                      */
 
-                            //         GeneralForm.report.setUserImage("https://media.licdn.com/mpr/mpr/shrinknp_200_200/AAEAAQAAAAAAAAR8AAAAJDdjZGVlYzY1LWEwYTYtNDUzOS1iMGI5LTU0Mzk3NzgxNGVjYw.jpg");
-                            //         GeneralForm.report.setUserName("Sajjad");
+                        //         GeneralForm.report.setUserImage("https://media.licdn.com/mpr/mpr/shrinknp_200_200/AAEAAQAAAAAAAAR8AAAAJDdjZGVlYzY1LWEwYTYtNDUzOS1iMGI5LTU0Mzk3NzgxNGVjYw.jpg");
+                        //         GeneralForm.report.setUserName("Sajjad");
 
 /*
             Log.d("Report Date",GeneralForm.report.getDate());
@@ -231,6 +279,8 @@ public class GeneralForm extends AppCompatActivity implements View.OnClickListen
 
     /*When Image button click*/
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        /*For get camera image*/
         if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
@@ -280,6 +330,32 @@ public class GeneralForm extends AppCompatActivity implements View.OnClickListen
             GeneralForm.report.setReportImage(imgPath);
 
         }
+        /*For Location search*/
+
+        else if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                Log.d("Tag", "Place: " + place.getName());
+
+                mlocation.getLocationFromAddress((String) place.getAddress());
+
+                Address = ((String) place.getAddress()).split(", ");
+                //    text_area.setText(place.getName());
+                text_area.setText(Address[0] + ", " + Address[1]);
+                report.setPlace(Address[0]);
+                report.setCity(Address[1]);
+                if (Address[2] != null)
+                    report.setCountry(Address[2]);
+
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(this, data);
+                // TODO: Handle the error.
+                Log.i("Tag", status.getStatusMessage());
+
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
+        }
 
     }
 
@@ -294,50 +370,48 @@ public class GeneralForm extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View v) {
 
-            if (v == mPhotoicon) {
-                mIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(mIntent, CAMERA_REQUEST);
+        if (v == mPhotoicon) {
+            mIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(mIntent, CAMERA_REQUEST);
 
-            } else if (v == mComment || v == mCommenticon) {
+        } else if (v == mComment || v == mCommenticon) {
 
-                mIntent = new Intent(GeneralForm.this, ReportComment.class);
-                startActivity(mIntent);
+            mIntent = new Intent(GeneralForm.this, ReportComment.class);
+            startActivity(mIntent);
 
-            } else if (v == send) {
+        } else if (v == send) {
+
+            if (SplashScreen.isOnline(GeneralForm.this)) {
+                GPSTracker tracker = new GPSTracker(this);
+                Log.d("Tracker Long", "" + tracker.getLongitude());
+                Log.d("Tracker Lat", "" + tracker.getLatitude());
+                report.setLongitude(tracker.getLongitude());
+                report.setLatitude(tracker.getLatitude());
+
+                mlocation.getLocationFromAddress(tracker.getLatitude(), tracker.getLongitude());
+
                 send.setClickable(false);
-                Log.d("click","send");
-                if (category_flag&&GeneralForm.report.getLatitude()!=null&&GeneralForm.report.getLongitude()!=null) {
-                    try {
-                        ProgressDialog dialog = ProgressDialog.show(GeneralForm.this, "",
-                                "Sending. Please wait...", true);
-                        dialog.setCanceledOnTouchOutside(false);
-                    }
-                    catch (Exception e){}
-                    turn=-1;
-                    GeneralForm.report.setDate(CurrentDate());
-                    GeneralForm.report.setVote(0);
-                    if (GeneralForm.report.getDescribtion() == null) {
-                        GeneralForm.report.setDescribtion("No description provides");
-                    }
-                    SplashScreen.sql.InsertReportData();
-                    SplashScreen.sql.show();
-                    GeneralForm.report = new Report();
-                    ReportActivity.mData = new ReportData();
-                    Intent intent = new Intent(GeneralForm.this, HomeActivity.class);
-                    startActivity(intent);
-                    finish();
+                Log.d("click", "send");
+                Log.d("Latitude", "" + GeneralForm.report.getLatitude());
+                Log.d("Longitude", "" + GeneralForm.report.getLongitude());
+                if (category_flag && GeneralForm.report.getLatitude() != null && GeneralForm.report.getLongitude() != null) {
 
-                } else {
-                    if (GeneralForm.report.getLatitude()!=null&&GeneralForm.report.getLongitude()!=null){
-                        HomeActivity.showMessage("GPS Is Disable", "Please check your Device's GPS.", GeneralForm.this);
-                    }
+                    Edit_PopUp();
 
-                    else if(!category_flag) {
-                        HomeActivity.showMessage("Incomplete", "Please select a category", GeneralForm.this);
-                    }
-
-                    send.setClickable(true);
                 }
+                else if (GeneralForm.report.getLatitude() == null || GeneralForm.report.getLongitude() == null) {
+                    HomeActivity.showMessage("GPS Is Disable", "Please check your Device's GPS.", GeneralForm.this);
+                } else if (!category_flag) {
+                    HomeActivity.showMessage("Incomplete", "Please select a category", GeneralForm.this);
+                }
+
+
+                send.setClickable(true);
+            }
+            else {
+                HomeActivity.showMessage("Internet Off", "Please check your Internet Connection .", GeneralForm.this);
+
+            }
 
 
         } else if (v == later) {
@@ -379,7 +453,7 @@ public class GeneralForm extends AppCompatActivity implements View.OnClickListen
     }
 
     public void ApplySelectedEffect(int i) {
-        category_flag=true;
+        category_flag = true;
         ChangeTurn(i);
         layout[i].setBackgroundColor(getResources().getColor(R.color.bg));
         text_subcat[i + 1].setTextColor(getResources().getColor(R.color.white));
@@ -438,11 +512,11 @@ public class GeneralForm extends AppCompatActivity implements View.OnClickListen
 
                 mCommenttext.setText(GeneralForm.report.getDescribtion());
                 //   ReportActivity.mData.photo=photo;
-       //         mCommenttext.setText("Successfully add!");
+                //         mCommenttext.setText("Successfully add!");
 
             }
             if (ReportActivity.mData.select_subcat != -1) {
-                String subcat=mResourceData.SubCatname[mSubCatIndex[PopUp.Select_SubCatIndex]][ReportActivity.mData.select_subcat + 1];
+                String subcat = mResourceData.SubCatname[mSubCatIndex[PopUp.Select_SubCatIndex]][ReportActivity.mData.select_subcat + 1];
 
                 ChangeTurn(ReportActivity.mData.Subcat_Turn);
 
@@ -454,7 +528,7 @@ public class GeneralForm extends AppCompatActivity implements View.OnClickListen
                 text_subcat[ReportActivity.mData.Subcat_Turn + 1].setTextColor(getResources().getColor(R.color.white));
                 text_subcat[ReportActivity.mData.Subcat_Turn + 1].setText(subcat);
                 report.setSubCategory1(subcat);
-                category_flag=true;
+                category_flag = true;
                 ReportActivity.mData.select_subcat = -1;
 
             }
@@ -462,4 +536,190 @@ public class GeneralForm extends AppCompatActivity implements View.OnClickListen
 
     }
 
+
+    public void Edit_PopUp() {
+        final long[] date = new long[1];
+        final View dialogView = View.inflate(GeneralForm.this, R.layout.edit_dialog, null);
+        final AlertDialog alertDialog = new AlertDialog.Builder(GeneralForm.this).create();
+
+        text_area = (EditText) dialogView.findViewById(R.id.search);
+        text_area.setText(GeneralForm.report.getPlace() + ", " + GeneralForm.report.getCity());
+
+        search_area = (Button) dialogView.findViewById(R.id.search_area);
+        search_area.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    //      performSearch();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        search_area.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    /*Search place code*/
+                    Intent intent =
+                            new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                                    .build(GeneralForm.this);
+                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                    AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                            .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
+                            .build();
+
+                    intent =
+                            new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                                    .setFilter(typeFilter)
+                                    .build(GeneralForm.this);
+                } catch (GooglePlayServicesRepairableException e) {
+                    // TODO: Handle the error.
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    // TODO: Handle the error.
+                }
+            }
+        });
+
+
+        dialogView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
+            //dd-MM-yyyy kk:mm:ss
+            String date_time = "";
+
+            @Override
+            public void onClick(View view) {
+            /*Location Work*/
+
+
+
+            /*Date & Time work */
+                DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.date_picker);
+                TimePicker timePicker = (TimePicker) dialogView.findViewById(R.id.time_picker);
+
+                Calendar calendar = new GregorianCalendar(datePicker.getYear(),
+                        datePicker.getMonth(),
+                        datePicker.getDayOfMonth(),
+                        timePicker.getCurrentHour(),
+                        timePicker.getCurrentMinute());
+
+                date[0] = calendar.getTimeInMillis();
+                date_time += datePicker.getDayOfMonth() + "-" + (datePicker.getMonth() + 1) + "-" + datePicker.getYear();
+
+
+                //   date_time+=" "+timePicker.getCurrentHour()+":"+timePicker.getCurrentMinute()+":";
+
+                Log.d("Date", "= " + datePicker.getDayOfMonth() + ":" + (datePicker.getMonth() + 1) + "," + datePicker.getYear());
+
+
+              /*  if(timePicker.getCurrentHour()>12){
+                    date_time+=" "+(timePicker.getCurrentHour()-12)+":"+timePicker.getCurrentMinute()+":PM";
+                }
+                else {*/
+                date_time += " " + timePicker.getCurrentHour() + ":" + timePicker.getCurrentMinute();
+                //}
+                turn = -1;
+                GeneralForm.report.setDate(date_time);
+                GeneralForm.report.setVote(0);
+                if (GeneralForm.report.getDescribtion() == null) {
+                    GeneralForm.report.setDescribtion("No description provides");
+                }
+                SplashScreen.sql.InsertReportData(GeneralForm.report);
+                SplashScreen.sql.show();
+
+                Log.d("Date_Time=", date_time);
+                JSONObject object = Report_Json(GeneralForm.report);
+                Log.d("Json", "" + object);
+
+                ServerConnection serverConnection = new ServerConnection(GeneralForm.this,0,object,null);
+                serverConnection.SubmitToServer();
+                Intent intent = new Intent(GeneralForm.this, HomeActivity.class);
+                startActivity(intent);
+                finish();
+                GeneralForm.report = new Report();
+                ReportActivity.mData = new ReportData();
+
+                alertDialog.dismiss();
+            }
+        });
+        alertDialog.setView(dialogView);
+        alertDialog.show();
+
+    }
+
+/*
+
+    Log.d("class", "" + r.getCategory());
+    Log.d("category", "" + r.getSubCategory());
+    Log.d("sub_category", "" + r.getSubCategory1());
+    Log.d("longitude", "" + r.getLongitude());
+    Log.d("latitude", "" + r.getLatitude());
+    Log.d("city", "" + r.getCity());
+    Log.d("date", "" + r.getDate());
+    Log.d("report_image", "" + r.getReportImage());
+    Log.d("user_name", "" + r.getUserName());
+    Log.d("user_image", "" + r.getUserImage());
+    Log.d("place", "" + r.getPlace());
+*/
+
+    public JSONObject Report_Json(Report r) {
+        JSONObject obj = new JSONObject();
+
+        Log.d("debug", "ReportJSON**********");
+        //    Log.d("id=", "" + c.getString(0));
+        Log.d("vote", "" + r.getVote());
+        Log.d("description", "" + r.getDescribtion());
+
+        try {
+            obj.put("Votes", "" + r.getVote());
+            obj.put("Description", "" + r.getDescribtion());
+            obj.put("ClassId", "" + r.getCategory());
+            obj.put("CategoryId", "" + r.getSubCategory());
+
+            if(r.getSubCategory1()!=null)
+            obj.put("SubCategoryId", "" + r.getSubCategory1());
+            obj.put("Longitude", "" + r.getLongitude());
+            obj.put("Latitude", "" + r.getLatitude());
+            obj.put("Place", "" + r.getPlace());
+            obj.put("City", "" + r.getCity());
+            obj.put("StreetNumber",JSONObject.NULL );
+            obj.put("Street",JSONObject.NULL );
+            obj.put("State",JSONObject.NULL );
+            obj.put("CountryCode",JSONObject.NULL );
+            obj.put("PostCode",JSONObject.NULL );
+            obj.put("District",JSONObject.NULL );
+            obj.put("CreatedDate", "" +ConvertDate(r.date));
+
+
+           // obj.put("ApplicationUserId", "null");
+
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+        return obj;
+    }
+
+    String ConvertDate(String date) throws ParseException {
+        SimpleDateFormat fromFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        fromFormat.setLenient(false);
+
+        SimpleDateFormat toFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        toFormat.setLenient(false);
+        Date d = fromFormat.parse(date);
+        System.out.println(""+toFormat.format(d));
+
+
+        return ""+toFormat.format(d);
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+
+    }
 }

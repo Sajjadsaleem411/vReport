@@ -290,7 +290,11 @@ public class MainListFragment extends Fragment {
             //Lets take first possibility from the all possibilities.
             Address location = address.get(0);
             place=address.get(0).getAddressLine(0);
-            city=address.get(0).getAddressLine(1)  +", "+address.get(0).getAddressLine(2);
+            city=address.get(0).getAddressLine(1);
+            /*
+            * contry
+            * +", "+address.get(0).getAddressLine(2)
+            * */
             editText.setText(place);
             CallAdapter();
 

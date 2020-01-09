@@ -109,7 +109,7 @@ public class FoldingCellListAdapter extends ArrayAdapter<Report> implements View
         viewHolder.subCategory.setText(item.getSubCategory());
         viewHolder.votes.setText("" + item.getVote());
         viewHolder.location.setText(item.getPlace());
-        viewHolder.city.setText(item.getCity());
+        viewHolder.city.setText(item.getCity()+", "+item.getCountry());
 
         if (!IsEmpty(item.getDescribtion())) {
 
@@ -118,7 +118,7 @@ public class FoldingCellListAdapter extends ArrayAdapter<Report> implements View
         }
 
         viewHolder.content_votes.setText("" + item.getVote());
-        viewHolder.content_location.setText("" + item.getPlace());
+        viewHolder.content_location.setText("" + item.getPlace()+", "+item.getCountry());
         viewHolder.content_date.setText("" + date[1]);
         viewHolder.content_time.setText("" + date[0]);
         viewHolder.content_endores.setText(item.getVote() + " people have endorsed this");
@@ -135,7 +135,7 @@ public class FoldingCellListAdapter extends ArrayAdapter<Report> implements View
                 Picasso.with(getContext()).load(f).into(viewHolder.content_reportImage);
 
             }
-
+/*
             viewHolder.content_reportImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -153,28 +153,9 @@ public class FoldingCellListAdapter extends ArrayAdapter<Report> implements View
                         Picasso.with(getContext()).load(f).into(image);
 
                     }
-/*
-                    // set the custom dialog components - text, image and button
-                    TextView text = (TextView) dialog.findViewById(R.id.text);
-                    text.setText(message);*/
-
-/*
-
-                    Button dialogButton = (Button) dialog.findViewById(R.id.dialogButton);
-                    // if button is clicked, close the custom dialog
-                    dialogButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            dialog.dismiss();
-
-                        }
-                    });
-*/
-
                     dialog.show();
                 }
-            });
+            });*/
 
         }
         else {
@@ -220,7 +201,7 @@ public class FoldingCellListAdapter extends ArrayAdapter<Report> implements View
 
     private String HoursToAP(String time) {
         try {
-            final SimpleDateFormat sdf = new SimpleDateFormat("kk:mm:ss");
+            final SimpleDateFormat sdf = new SimpleDateFormat("kk:mm");
             final Date dateObj = sdf.parse(time);
             return new SimpleDateFormat("hh:mm a").format(dateObj);
         } catch (final ParseException e) {

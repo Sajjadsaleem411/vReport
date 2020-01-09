@@ -44,7 +44,7 @@ public class Resources {
 
     public String[][] name = {
             {"Traffic", "Moderate", "High", "Deadlock"},
-            {"Civic Issue", "Illegal Billboard", "Parking", "Garbage"},
+            {"Civic", "Illegal Billboard", "Parking", "Garbage"},
             {"Crime", "Car Theft", "ShotFire", "Robbery"},
             {"Hazard", "Fire Accident", "PotHole", "Road Issue"},
             {"Weather", "Fog", "Storm", "Rain Water"}
@@ -52,5 +52,9 @@ public class Resources {
 
     public String[] category_dropdown = {"Traffic Problem", "Civic Issue", "Crime Accident"
             , "Hazard Issue", "Weather Condition","All Category"};
+
+
+    public String[] category_graph = {"Traffic", "Civic", "Crime"
+            , "Hazard", "Weather"};
 
 }

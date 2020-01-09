@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "261856940813",
+    "project_id": "vreport-app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261856940813:android:48c17e16dee2b0df",
+        "android_client_info": {
+          "package_name": "app.vreport.com"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "261856940813-f02rfbrmp7evjo0ojsvflmhal8u457fr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAr1zfcp-OrzTAmI41YW7yw82NcjQM42F8"
+        },
+        {
+          "current_key": "AIzaSyCqUuwM_-wjaWo1D5H4yfolyUwEqB4A6GY"
+        },
+        {
+          "current_key": "AIzaSyClTEUKv1dUwRFkrp8KBmvXvgXDpXvqqNk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

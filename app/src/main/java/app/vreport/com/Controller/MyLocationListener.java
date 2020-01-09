@@ -41,11 +41,11 @@ public class MyLocationListener implements LocationListener {
         Log.d("TAG", longitude);
         String latitude = "Latitude: " + loc.getLatitude();
         Log.d("TAG", latitude);
+
+        GeneralForm.report.setLocation(loc);
         GeneralForm.report.setLatitude(loc.getLatitude());
         GeneralForm.report.setLongitude(loc.getLongitude());
 
-        HomeActivity.mlat=loc.getLatitude();
-        HomeActivity.mlog=loc.getLongitude();
 
     /*----------to get City-Name from coordinates ------------- */
             String cityName = null;
@@ -61,9 +61,11 @@ public class MyLocationListener implements LocationListener {
 
                 Log.d("address loc",""+addresses.get(0).getLocality());
                 GeneralForm.report.setPlace(addresses.get(0).getAddressLine(0));
-                GeneralForm.report.setCity( addresses.get(0).getAddressLine(1)  +", "+addresses.get(0).getAddressLine(2));
+                GeneralForm.report.setCity( addresses.get(0).getAddressLine(1));
+                GeneralForm.report.setCountry( addresses.get(0).getAddressLine(2));
 
-                    System.out.println(addresses.get(0).getLocality());
+
+                System.out.println(addresses.get(0).getLocality());
                 cityName = addresses.get(0).getFeatureName() + "," + addresses.get(0).getSubAdminArea() + "," + addresses.get(0).getAdminArea() + "," + addresses.get(0).getLocality() + ","
                         + addresses.get(0).getAdminArea() +
                         "," + addresses.get(0).getCountryName();

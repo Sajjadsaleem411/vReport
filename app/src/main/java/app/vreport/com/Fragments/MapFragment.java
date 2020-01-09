@@ -58,6 +58,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import app.vreport.com.Activities.HomeActivity;
 import app.vreport.com.Activities.SplashScreen;
+import app.vreport.com.Controller.GPSTracker;
 import app.vreport.com.Model.Map;
 import app.vreport.com.Model.Resources;
 import app.vreport.com.R;
@@ -105,8 +106,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Connect
     View mView;
     EditText editText;
 
-
-    Location locationCt;
+    Double c_lon,c_lat;
+//    Location locationCt;
     Location mLastLocation;
 
     // newInstance constructor for creating fragment with arguments
@@ -116,6 +117,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Connect
         args.putInt("someInt", page);
         args.putString("someTitle", title);
         fragmentFirst.setArguments(args);
+
         return fragmentFirst;
     }
 
@@ -125,57 +127,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Connect
         super.onCreate(savedInstanceState);
         page = getArguments().getInt("someInt", 0);
         title = getArguments().getString("someTitle");
- /*       if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this).build();
-            mGoogleApiClient.connect();
 
-            LocationRequest locationRequest = LocationRequest.create();
-            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            locationRequest.setInterval(30 * 1000);
-            locationRequest.setFastestInterval(5 * 1000);
-            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                    .addLocationRequest(locationRequest);
 
-            *//*************************//*
-            builder.setAlwaysShow(true); //this is the key ingredient
-            *//*************************//*
+        GPSTracker tracker=new GPSTracker(getContext());
 
-            PendingResult<LocationSettingsResult> result =
-                    LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
-            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-                @Override
-                public void onResult(LocationSettingsResult result) {
-                    final Status status = result.getStatus();
-                    final LocationSettingsStates state = result.getLocationSettingsStates();
-                    switch (status.getStatusCode()) {
-                        case LocationSettingsStatusCodes.SUCCESS:
-                            // All location settings are satisfied. The client can initialize location
-                            // requests here.
-                            break;
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            // Location settings are not satisfied. But could be fixed by showing the user
-                            // a dialog.
-                            try {
-                                // Show the dialog by calling startResolutionForResult(),
-                                // and check the result in onActivityResult().
-                                status.startResolutionForResult(getActivity(), REQUEST_CHECK_SETTINGS);
+        Log.d("T_Long",""+tracker.getLongitude());
+        Log.d("T_Lat",""+tracker.getLatitude());
 
-                            } catch (IntentSender.SendIntentException e) {
-                                // Ignore the error.
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                            // Location settings are not satisfied. However, we have no way to fix the
-                            // settings so we won't show the dialog.
-                            break;
-                    }
-                }
-            });
-        }
-*/
+        c_lon=tracker.getLongitude();
+        c_lat=tracker.getLatitude();
+
+
     }
 
     // Inflate the view for the fragment based on layout XML
@@ -189,7 +151,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Connect
         // Create the LocationRequest object
         try {
 
-            getCurrentLocation();
+          //  getCurrentLocation();
 
             resources = new Resources();
             final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
@@ -284,10 +246,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Connect
         return mView;
     }
 
-    public void getCurrentLocation() {
+ /*   public void getCurrentLocation() {
 
         LocationManager locationManagerCt = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-      /*  if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+      *//*  if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -296,59 +258,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Connect
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
             return TODO;
-        }*/
+        }*//*
+
         locationCt = locationManagerCt
                 .getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-    }
+    }*/
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-// Check for the integer request code originally supplied to startResolutionForResult().
-            case REQUEST_CHECK_SETTINGS:
-                switch (resultCode) {
-
-                    case Activity.RESULT_OK:
-                        //      startActivity(new Intent(HomeActivity.this,HomeActivity.class));
-                        //      finish();
-
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                //      mGoogleMap.getMyLocation();
-                                /*
-                                getCurrentLocation();
-                                MarkerOptions marker = new MarkerOptions().position(
-                                        new LatLng(locationCt.getLatitude(), locationCt.getLongitude())).title("Current Location").snippet("Discription");
-
-                                marker.icon(BitmapDescriptorFactory
-                                        .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-
-// Moving Camera to a Location with animation
-                                CameraPosition cameraPosition = new CameraPosition.Builder()
-                                        .target(new LatLng(locationCt.getLatitude(), locationCt.getLongitude())).zoom(15).build();
-                                mGoogleMap.animateCamera(CameraUpdateFactory
-                                        .newCameraPosition(cameraPosition));
-
-                                mGoogleMap.addMarker(marker);*/
-                            }
-                        }, 3000);
-                        break;
-                    case Activity.RESULT_CANCELED:
-
-                        break;
-                }
-                break;
-        }
-
-
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == getActivity().RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(getContext(), data);
                 Log.d("Tag", "Place: " + place.getName());
                 Log.d("Tag", "Place: " + place.getAddress());
+
                 editText.setText(place.getName());
                 getLocationFromAddress((String) place.getAddress());
 
@@ -361,6 +285,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Connect
                 // The user canceled the operation.
             }
         }
+
     }
 
     public void getLocationFromAddress(String strAddress) {
@@ -393,7 +318,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Connect
         */    //Put marker on map on that LatLng
 
             AddMarker(new boolean[]{true, true, true, true, true});
-            Marker srchMarker = HomeActivity.mGoogleMap.addMarker(new MarkerOptions().position(latLng).title("Search Location").icon(BitmapDescriptorFactory
+            Marker srchMarker =HomeActivity.mGoogleMap.addMarker(new MarkerOptions().position(latLng).title("Search Location").icon(BitmapDescriptorFactory
                     .defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
 
             //Animate and Zoon on that map location
@@ -404,6 +329,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Connect
             e.printStackTrace();
         }
     }
+
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -445,32 +371,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Connect
             //    googleMap.getUiSettings().setZoomGesturesEnabled(true);
             //    googleMap.getUiSettings().setRotateGesturesEnabled(true);
 
-      /*      LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            List<String> providers = mLocationRequest.getProviders(true);
-            Location l = null;
-
-            for (int i = 0; i < providers.size(); i++) {
-                l = lm.getLastKnownLocation(providers.get(i));
-                if (l != null) {
-                    currentLatitude = l.getLatitude();
-                    currentLongitude = l.getLongitude();
-        *//*            strAdd = getCompleteAddressString(currentLatitude, currentLongitude);
-                    tvAddress.setText("Complete Address : " + strAdd);
-        *//*            break;
-                }
-            }
-
-*/
             if (googleMap != null) {
                 //    if (currentLongitude != 0 && currentLatitude != 0) {
 
-                LatLng latLng=new LatLng(locationCt.getLatitude(), locationCt.getLongitude());
+                LatLng latLng = new LatLng(c_lat, c_lon);
                 MarkerOptions marker = new MarkerOptions().position(latLng).title("Current Location").snippet("Discription");
 
                 marker.icon(BitmapDescriptorFactory
                         .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
 
-               // Moving Camera to a Location with animation
+                // Moving Camera to a Location with animation
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(latLng).zoom(15).build();
 
@@ -595,7 +505,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Connect
 
         Toast.makeText(getContext(), currentLatitude + " WORKS " + currentLongitude + "", Toast.LENGTH_LONG).show();
 
-        HomeActivity.mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(currentLatitude, currentLongitude)).title("Location").icon(BitmapDescriptorFactory
+        HomeActivity.mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(c_lat, currentLongitude)).title("Location").icon(BitmapDescriptorFactory
                 .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
         //Animate and Zoon on that map location
         HomeActivity.mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLatitude, currentLongitude)));

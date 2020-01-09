@@ -31,7 +31,7 @@
         <!-- API KEY -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDMbsANYcgtck59CLiFeSLj3aMk8GDDRnY" />
+            android:value="@string/API_Key" />
 
         <activity
             android:name=".Activities.SplashScreen"
@@ -52,9 +52,9 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Activities.LoginActivity"
-            android:label="@string/title_activity_login"
+            android:label="Login"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <uses-feature
             android:glEsVersion="0x00020000"
@@ -90,7 +90,8 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".Activities.Profile"></activity>
+        <activity android:name=".Activities.Profile" />
+        <activity android:name=".Activities.LoadingAcitity"></activity>
     </application>
 
 </manifest>
